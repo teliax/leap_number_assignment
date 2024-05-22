@@ -11,7 +11,7 @@ class SiteService
   def fetch
     sites = []
     begin
-      response = self.class.get("https://uc.leap.tel/customer/sites",
+      response = self.class.get("#{Input::HOST}/customer/sites",
         headers: {'Authorization' => "Bearer #{self.access_token}", 'Content-Type' => 'application/json', 'Accept' => 'application/json'}
       )
 

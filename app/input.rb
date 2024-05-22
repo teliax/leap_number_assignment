@@ -1,11 +1,13 @@
 class Input
-  attr_accessor :email, :password, :tn_file_location, :site_choice
+  HOST = 'http://localhost:3000'
+  attr_accessor :email, :password, :tn_file_location, :site_choice, :action
 
-  def initialize(username, passwd, file_location)
+  def initialize(username, passwd, file_location, operation)
     @email = username
     @password = passwd
     @tn_file_location = file_location
     @site_choice = nil
+    @action = operation
   end
 
   class << self
@@ -19,7 +21,9 @@ class Input
       # puts "Please provide DID file location CSV"
       file_location  = ENV['DID_FILE_LOCATION'].to_s.blank? ? prompt_file_location() : (puts("Using the DID file location from environment!"); ENV['DID_FILE_LOCATION'])
 
-      Input.new(username.strip, passwd.strip, file_location.strip)
+      action = ENV['PHHONE_NUMBER_ACTION'].to_s.blank? ? prompt_action : (puts("Using the action from environment!"); ENV['PHHONE_NUMBER_ACTION'].to_i)
+
+      Input.new(username.strip, passwd.strip, file_location.strip, action)
     end
 
     def populate_site_choice(sites, input)
@@ -41,6 +45,23 @@ class Input
       def prompt_file_location
         print "Please enter the location to the numbers file: "
         gets
+      end
+
+      def prompt_action()
+        puts "Please choose the action you want to perform:"
+        PhoneNumberService::ACTION_MAP.each do |key, value|
+          puts "#{key} => #{value[:label]}"
+        end
+
+        print "Please enter a serial number for the action: "
+        choice = gets
+        choice = choice.to_i
+
+        if PhoneNumberService::ACTION_MAP.keys.include?(choice)
+          return choice
+        else
+          prompt_action
+        end
       end
 
       def prompt_site_selection(sites)

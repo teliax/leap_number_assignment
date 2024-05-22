@@ -10,7 +10,7 @@ class AuthenticationService
 
   def fetch_token
     begin
-      response = self.class.post("https://uc.leap.tel/users/sign_in",
+      response = self.class.post("#{Input::HOST}/users/sign_in",
         body: {
           username: email,
           password: password,

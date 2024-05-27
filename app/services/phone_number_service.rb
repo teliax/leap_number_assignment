@@ -39,7 +39,7 @@ class PhoneNumberService
   end # end of assign_phone numbers method
 
   def delete_phone_numbers
-    stats = {success: [], failure: [], errors: []}
+    stats = {success: [], failure: [], errors: [], deleted_numbers: []}
     phone_numbers_map = fetch_site_phone_numbers_map
 
     counter = 0
@@ -49,6 +49,7 @@ class PhoneNumberService
     end
 
     write_phone_number_deletion_stats(stats)
+    write_success_did_file(stats)
   end
 
   private
@@ -136,6 +137,7 @@ class PhoneNumberService
 
         if 200 == response.code || 204 == response.code
           stats[:success] << "ID: #{id} | DID: #{number} | Reponse code: #{response.code}"
+          stats[:deleted_numbers] << number
         elsif 401 == response.code
           renew_token
           return porocess_row_for_deletion(dids_map, row, stats)
@@ -174,8 +176,7 @@ class PhoneNumberService
       end
     end
 
-    def
-       fetch_phone_number_list_response
+    def fetch_phone_number_list_response
       self.class.get("#{Input::HOST}/customer/phone-numbers",
         query: {site_id: site_id},
         headers: {'Authorization' => "Bearer #{self.access_token}", 'Content-Type' => 'application/json', 'Accept' => 'application/json'}
@@ -191,5 +192,11 @@ class PhoneNumberService
       end
 
       dids_map
+    end
+
+    def write_success_did_file(stats)
+      File.open("delete_numbers.txt", 'w') do  |file|
+        file.puts(stats[:deleted_numbers].join("\n"))
+      end
     end
 end # end of PhoneNumberService class

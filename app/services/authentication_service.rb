@@ -24,7 +24,7 @@ class AuthenticationService
         puts("Successfully fetched authentication token from Leap")
         LeapAuth.new(response['access_token'], response['refresh_token'], response['expires_in'])
       elsif 400 == code
-        raise Quickbooks::OAuthRegtrationFailed.new("Registration with QBOAuth services failed!!")
+        raise Exception.new("Registration with Leap portal failed!!")
       end
     rescue => e
       puts("Could not fetch the authentication token from Leap")
